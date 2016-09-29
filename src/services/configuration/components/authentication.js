@@ -1,5 +1,4 @@
-import {Preferences, Storage} from 'eon.extension.browser';
-import Callbacks from 'eon.extension.framework/core/callbacks';
+import {Preferences, Resources, Storage} from 'eon.extension.browser';
 import Popup from 'eon.extension.framework/core/popup';
 import {WindowMessaging} from 'eon.extension.framework/messaging/window';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
@@ -39,7 +38,7 @@ export default class AuthenticationComponent extends OptionComponent {
     onLoginClicked() {
         // Build authorization url
         var url = Client['auth'].getAuthorizeUrl({
-            callbackUrl: 'chrome-extension://mnkagkgiiedkikkkajbpopoonoddlimm/destination.lastfm.callback/destination.lastfm.callback.html'
+            callbackUrl: Resources.getUrl('/destination.lastfm.callback/destination.lastfm.callback.html')
         });
 
         // Open authorization page in popup
