@@ -17,7 +17,7 @@ export class Scrobble extends ScrobbleService {
 
     onStarted(session) {
         // Build `item` for request
-        var item = this._buildRequest(session.item);
+        let item = this._buildRequest(session.item);
 
         if(item === null) {
             console.warn('Unable to build request for session:', session);
@@ -70,11 +70,12 @@ export class Scrobble extends ScrobbleService {
 
     _scrobble(session) {
         // Build `item` for request
-        var item = this._buildRequest(session.item);
+        let item = this._buildRequest(session.item);
 
         if(item === null) {
-            console.warn('Unable to build request for session:', session);
-            return;
+            return Promise.reject(new Error(
+                'Unable to build request for session: ' + session
+            ));
         }
 
         // Set `item` parameters

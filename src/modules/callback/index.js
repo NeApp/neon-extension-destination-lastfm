@@ -9,7 +9,7 @@ function process() {
         return;
     }
 
-    var parent = (window.opener || window.parent);
+    let parent = (window.opener || window.parent);
 
     if(parent === null) {
         Messaging.emit('reject', 'Unable to find parent window');
@@ -17,7 +17,7 @@ function process() {
     }
 
     // Decode query string
-    var query = querystring.decode(window.location.search.substring(1));
+    let query = querystring.decode(window.location.search.substring(1));
 
     // Emit response event
     if(typeof query.token !== 'undefined') {

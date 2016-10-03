@@ -1,6 +1,5 @@
-import {Preferences, Resources, Storage} from 'eon.extension.browser';
+import {Resources, Storage} from 'eon.extension.browser';
 import Popup from 'eon.extension.framework/core/popup';
-import {WindowMessaging} from 'eon.extension.framework/messaging/window';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
 
 import React from 'react';
@@ -37,7 +36,7 @@ export default class AuthenticationComponent extends OptionComponent {
 
     onLoginClicked() {
         // Build authorization url
-        var url = Client['auth'].getAuthorizeUrl({
+        let url = Client['auth'].getAuthorizeUrl({
             callbackUrl: Resources.getUrl('/destination.lastfm.callback/destination.lastfm.callback.html')
         });
 
@@ -115,7 +114,7 @@ export default class AuthenticationComponent extends OptionComponent {
     render() {
         if(this.state.authenticated) {
             // Logged in
-            var account = this.state.account;
+            let account = this.state.account;
 
             return (
                 <div data-component={Plugin.id + ':authentication'} className="box active">
@@ -130,11 +129,17 @@ export default class AuthenticationComponent extends OptionComponent {
                             <h3 className="title">{account.realname || account.name}</h3>
 
                             <div className="actions">
-                                <button type="button" className="button secondary small" onClick={this.refresh.bind(this)}>
+                                <button
+                                    type="button"
+                                    className="button secondary small"
+                                    onClick={this.refresh.bind(this)}>
                                     Refresh
                                 </button>
 
-                                <button type="button" className="button secondary small" onClick={this.logout.bind(this)}>
+                                <button
+                                    type="button"
+                                    className="button secondary small"
+                                    onClick={this.logout.bind(this)}>
                                     Logout
                                 </button>
                             </div>
@@ -148,7 +153,10 @@ export default class AuthenticationComponent extends OptionComponent {
         return (
             <div data-component={Plugin.id + ':authentication'} className="box login">
                 <div className="inner">
-                    <button type="button" className="button small" onClick={this.onLoginClicked.bind(this)}>
+                    <button
+                        type="button"
+                        className="button small"
+                        onClick={this.onLoginClicked.bind(this)}>
                         Login
                     </button>
                 </div>

@@ -1,7 +1,5 @@
 import {
-    CheckboxOption,
-    EnableOption,
-    Group
+    EnableOption
 } from 'eon.extension.framework/services/configuration/models';
 
 import AuthenticationOption from './models/authentication';
