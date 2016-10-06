@@ -1,18 +1,17 @@
-import Messaging from 'eon.extension.framework/messaging/window';
+import MessagingBus from 'eon.extension.framework/messaging/bus';
 
 import querystring from 'querystring';
 
 
 function process() {
+    // Connect to relay messaging bus
+    let bus = new MessagingBus(window.name + '/callback').connect(
+        'eon.extension.core:relay'
+    );
+
+    // Validate search parameters
     if(window.location.search.length < 2) {
-        Messaging.emit('reject', 'Missing search parameters');
-        return;
-    }
-
-    let parent = (window.opener || window.parent);
-
-    if(parent === null) {
-        Messaging.emit('reject', 'Unable to find parent window');
+        bus.relay(window.name, 'popup.reject', 'Missing search parameters');
         return;
     }
 
@@ -21,9 +20,9 @@ function process() {
 
     // Emit response event
     if(typeof query.token !== 'undefined') {
-        Messaging.emit('resolve', query.token);
+        bus.relay(window.name, 'popup.resolve', query.token);
     } else {
-        Messaging.emit('reject', 'Unable to retrieve token');
+        bus.relay(window.name, 'popup.reject', 'Unable to retrieve token');
     }
 }
 
