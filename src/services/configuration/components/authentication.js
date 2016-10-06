@@ -41,7 +41,7 @@ export default class AuthenticationComponent extends OptionComponent {
         });
 
         // Open authorization page in popup
-        Popup.open(url, '_blank', {
+        Popup.open(url, {
             location: 0,
             status: 0,
             toolbar: 0,
