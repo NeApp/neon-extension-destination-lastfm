@@ -57,12 +57,12 @@ export default class AuthenticationComponent extends OptionComponent {
               Client.session = session;
 
               // Update authorization token
-              Storage.putObject(Plugin.id + ':session', session).then(() => {
+              return Storage.putObject(Plugin.id + ':session', session).then(() => {
                   // Refresh account
                   return this.refresh();
               });
           }, (error) => {
-              console.warn('Unable to authentication with last.fm, error:', error.message);
+              console.warn('Unable to authenticate with last.fm, error:', error.message);
           });
     }
 

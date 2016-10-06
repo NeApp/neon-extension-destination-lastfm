@@ -24,6 +24,9 @@ function process() {
     } else {
         bus.relay(window.name, 'popup.reject', 'Unable to retrieve token');
     }
+
+    // Close window
+    window.close();
 }
 
 // Process callback
