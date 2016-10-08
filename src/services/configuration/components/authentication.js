@@ -1,4 +1,6 @@
-import {Resources, Storage} from 'eon.extension.browser';
+import Extension from 'eon.extension.browser/extension';
+import Storage from 'eon.extension.browser/storage';
+
 import Popup from 'eon.extension.framework/core/popup';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
 
@@ -37,11 +39,11 @@ export default class AuthenticationComponent extends OptionComponent {
     onLoginClicked() {
         // Build authorization url
         let url = Client['auth'].getAuthorizeUrl({
-            callbackUrl: Resources.getUrl('/destination.lastfm.callback/destination.lastfm.callback.html')
+            callbackUrl: Extension.getUrl('/destination.lastfm.callback/destination.lastfm.callback.html')
         });
 
         // Open authorization page in popup
-        Popup.open(url, '_blank', {
+        Popup.open(url, {
             location: 0,
             status: 0,
             toolbar: 0,
@@ -57,12 +59,12 @@ export default class AuthenticationComponent extends OptionComponent {
               Client.session = session;
 
               // Update authorization token
-              Storage.putObject(Plugin.id + ':session', session).then(() => {
+              return Storage.putObject(Plugin.id + ':session', session).then(() => {
                   // Refresh account
                   return this.refresh();
               });
           }, (error) => {
-              console.warn('Unable to authentication with last.fm, error:', error.message);
+              console.warn('Unable to authenticate with last.fm, error:', error.message);
           });
     }
 
