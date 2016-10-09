@@ -9,6 +9,6 @@
   },
 
   "web_accessible_resources": [
-    "destination.lastfm.callback/destination.lastfm.callback.html"
+    "destination/lastfm/callback/callback.html"
   ]
 }
