@@ -39,7 +39,7 @@ export default class AuthenticationComponent extends OptionComponent {
     onLoginClicked() {
         // Build authorization url
         let url = Client['auth'].getAuthorizeUrl({
-            callbackUrl: Extension.getUrl('/destination.lastfm.callback/destination.lastfm.callback.html')
+            callbackUrl: Extension.getUrl('/destination/lastfm/callback/callback.html')
         });
 
         // Open authorization page in popup
