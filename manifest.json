@@ -1,13 +1,11 @@
 {
   "name": "Last.fm",
-  "version": "0.1.0",
-
+  "version": "0.2.0",
   "permissions": {
     "origins": [
       "*://ws.audioscrobbler.com/2.0/*"
     ]
   },
-
   "web_accessible_resources": [
     "destination/lastfm/callback/callback.html"
   ]
