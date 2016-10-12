@@ -5,6 +5,7 @@ import Popup from 'eon.extension.framework/core/popup';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
 
 import React from 'react';
+import uuid from 'uuid';
 
 import Client from '../../../core/client';
 import Plugin from '../../../core/plugin';
@@ -37,13 +38,23 @@ export default class AuthenticationComponent extends OptionComponent {
     }
 
     onLoginClicked() {
-        // Build authorization url
+        let popupId = uuid.v4();
+
+        // Build callback url
+        let callbackUrl = Extension.getCallbackUrl(
+            popupId,
+            '/destination/lastfm/callback/callback.html'
+        );
+
+        // Build authorize url
         let url = Client['auth'].getAuthorizeUrl({
-            callbackUrl: Extension.getUrl('/destination/lastfm/callback/callback.html')
+            callbackUrl: callbackUrl
         });
 
         // Open authorization page in popup
         Popup.open(url, {
+            id: popupId,
+
             location: 0,
             status: 0,
             toolbar: 0,
