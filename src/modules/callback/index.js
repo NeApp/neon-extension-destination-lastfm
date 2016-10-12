@@ -1,8 +1,43 @@
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import Storage from 'eon.extension.browser/storage';
+
 import MessagingBus from 'eon.extension.framework/messaging/bus';
 
 import querystring from 'querystring';
 
+import Plugin from '../../core/plugin';
+
+
+function getCallbackId() {
+    if(window.name !== '') {
+        return Promise.resolve(window.name);
+    }
+
+    return Storage.getString(Plugin.id + ':authentication.latestPopupId')
+        .then((callbackId) =>
+            'eon.popup/' + callbackId
+        );
+}
+
+function sendResponse(callbackId, token) {
+    return new Promise((resolve) => {
+        // Connect to relay messaging bus
+        let bus = new MessagingBus(callbackId + '/callback').connect(
+            'eon.extension.core:relay'
+        );
+
+        // Emit response event
+        if(typeof token !== 'undefined') {
+            bus.relay(callbackId, 'popup.resolve', token);
+        } else {
+            bus.relay(callbackId, 'popup.reject', 'Unable to retrieve token');
+        }
+
+        // Disconnect messaging bus
+        bus.disconnectAll();
+
+        resolve();
+    });
+}
 
 function process() {
     // Validate search parameters
@@ -16,32 +51,12 @@ function process() {
         window.location.search.substring(1)
     );
 
-    // Retrieve callback identifier
-    let id;
-
-    if(isDefined(query.id)) {
-        id = 'eon.popup/' + query.id;
-    } else if(window.name !== '') {
-        id = window.name;
-    } else {
-        console.error('Unable to retrieve callback identifier');
-        return;
-    }
-
-    // Connect to relay messaging bus
-    let bus = new MessagingBus(id + '/callback').connect(
-        'eon.extension.core:relay'
-    );
-
-    // Emit response event
-    if(typeof query.token !== 'undefined') {
-        bus.relay(id, 'popup.resolve', query.token);
-    } else {
-        bus.relay(id, 'popup.reject', 'Unable to retrieve token');
-    }
-
-    // Close window
-    window.close();
+    // Send code to configuration page
+    getCallbackId().then((callbackId) => {
+        sendResponse(callbackId, query.token);
+    }).then(() => {
+        window.close();
+    });
 }
 
 // Process callback
