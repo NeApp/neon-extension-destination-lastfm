@@ -1,6 +1,6 @@
 {
   "name": "Last.fm",
-  "version": "0.2.0",
+  "version": "0.2.4",
   "permissions": {
     "origins": [
       "*://ws.audioscrobbler.com/2.0/*"
