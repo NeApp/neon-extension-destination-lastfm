@@ -2,9 +2,11 @@ import Extension from 'eon.extension.browser/extension';
 import Storage from 'eon.extension.browser/storage';
 
 import Popup from 'eon.extension.framework/core/popup';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
 
 import React from 'react';
+import uuid from 'uuid';
 
 import Client from '../../../core/client';
 import Plugin from '../../../core/plugin';
@@ -15,6 +17,8 @@ export default class AuthenticationComponent extends OptionComponent {
     constructor() {
         super();
 
+        this.popup = null;
+
         this.state = {
             authenticated: false,
             account: {}
@@ -22,6 +26,9 @@ export default class AuthenticationComponent extends OptionComponent {
     }
 
     componentWillMount() {
+        // Ensure previous popup has been disposed
+        this.disposePopup();
+
         // Retrieve account details
         Storage.getObject(Plugin.id + ':account')
             .then((account) => {
@@ -36,14 +43,42 @@ export default class AuthenticationComponent extends OptionComponent {
             });
     }
 
+    disposePopup() {
+        if(!isDefined(this.popup)) {
+            return;
+        }
+
+        // Dispose popup (close window, disconnect messaging channel)
+        try {
+            this.popup.dispose();
+        } catch(e) {
+            console.warn('Unable to dispose popup:', e.stack);
+        }
+
+        // Clear state
+        this.popup = null;
+    }
+
     onLoginClicked() {
-        // Build authorization url
-        let url = Client['auth'].getAuthorizeUrl({
-            callbackUrl: Extension.getUrl('/destination/lastfm/callback/callback.html')
+        let popupId = uuid.v4();
+
+        // Build callback url
+        let callbackUrl = Extension.getCallbackUrl(
+            '/destination/lastfm/callback/callback.html'
+        );
+
+        // Build authorize url
+        let authorizeUrl = Client['auth'].getAuthorizeUrl({
+            callbackUrl: callbackUrl
         });
 
-        // Open authorization page in popup
-        Popup.open(url, {
+        // Ensure previous popup has been disposed
+        this.disposePopup();
+
+        // Create popup
+        this.popup = Popup.create(authorizeUrl, {
+            id: popupId,
+
             location: 0,
             status: 0,
             toolbar: 0,
@@ -53,19 +88,26 @@ export default class AuthenticationComponent extends OptionComponent {
             height: 450,
 
             offsetTop: 100
-        }).then((token) => Client['auth'].getSession(token))
-          .then((session) => {
-              // Update client authorization
-              Client.session = session;
+        });
 
-              // Update authorization token
-              return Storage.putObject(Plugin.id + ':session', session).then(() => {
-                  // Refresh account
-                  return this.refresh();
-              });
-          }, (error) => {
-              console.warn('Unable to authenticate with last.fm, error:', error.message);
-          });
+        // Store latest popup id as fallback (for Firefox)
+        Storage.putString(Plugin.id + ':authentication.latestPopupId', popupId).then(() => {
+            // Open authorize popup
+            return this.popup.open()
+                .then((token) => Client['auth'].getSession(token))
+                .then((session) => {
+                    // Update client authorization
+                    Client.session = session;
+
+                    // Update authorization token
+                    return Storage.putObject(Plugin.id + ':session', session).then(() => {
+                        // Refresh account
+                        return this.refresh();
+                    });
+                }, (error) => {
+                    console.warn('Unable to authenticate with last.fm, error:', error.message);
+                });
+        });
     }
 
     refresh() {
