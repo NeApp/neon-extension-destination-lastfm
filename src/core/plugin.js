@@ -5,7 +5,7 @@ import Manifest from '../../manifest.json';
 
 export class LastFmPlugin extends DestinationPlugin {
     constructor() {
-        super('lastfm', 'Last.fm', Manifest);
+        super('lastfm', Manifest);
     }
 }
 
