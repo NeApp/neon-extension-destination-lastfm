@@ -1,6 +1,7 @@
-import {MediaTypes} from 'eon.extension.framework/core/enums';
 import Registry from 'eon.extension.framework/core/registry';
 import ScrobbleService from 'eon.extension.framework/services/destination/scrobble';
+import {MediaTypes} from 'eon.extension.framework/core/enums';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import Client from '../../core/client';
 import Plugin from '../../core/plugin';
@@ -12,12 +13,12 @@ export class Scrobble extends ScrobbleService {
             MediaTypes.Music.Track
         ]);
 
-        this._latestScrobbles = {};
+        this._recentScrobbles = {};
     }
 
     onStarted(session) {
         // Build `item` for request
-        let item = this._buildRequest(session.item);
+        let item = this._buildRequest(session.metadata);
 
         if(item === null) {
             console.warn('Unable to build request for session:', session);
@@ -33,7 +34,7 @@ export class Scrobble extends ScrobbleService {
     }
 
     onProgress(session) {
-        if(session.progress < 0.8 || !this._shouldScrobble(session)) {
+        if(session.progress < 80 || isDefined(this._recentScrobbles[session.key])) {
             return;
         }
 
@@ -45,8 +46,8 @@ export class Scrobble extends ScrobbleService {
         });
     }
 
-    onEnded(session) {
-        if(session.progress < 0.8 || !this._shouldScrobble(session)) {
+    onStopped(session) {
+        if(session.progress < 80 || isDefined(this._recentScrobbles[session.key])) {
             return;
         }
 
@@ -60,17 +61,15 @@ export class Scrobble extends ScrobbleService {
 
     // region Private methods
 
-    _shouldScrobble(session) {
-        if(typeof this._latestScrobbles[session.source.id] === 'undefined') {
-            return true;
+    _scrobble(session) {
+        if(isDefined(this._recentScrobbles[session.key])) {
+            return Promise.reject(new Error(
+                'Session has already been scrobbled'
+            ));
         }
 
-        return session.key > this._latestScrobbles[session.source.id];
-    }
-
-    _scrobble(session) {
         // Build `item` for request
-        let item = this._buildRequest(session.item);
+        let item = this._buildRequest(session.metadata);
 
         if(item === null) {
             return Promise.reject(new Error(
@@ -78,11 +77,11 @@ export class Scrobble extends ScrobbleService {
             ));
         }
 
-        // Set `item` parameters
+        // Set `item` timestamp
         item.timestamp = Math.round(Date.now() / 1000);
 
-        // Set latest scrobble
-        this._latestScrobbles[session.source.id] = session.key;
+        // Mark session as scrobbled
+        this._recentScrobbles[session.key] = item.timestamp;
 
         // Scrobble track
         return Client['track'].scrobble([item]);
