@@ -1,62 +1,33 @@
-import Storage from 'eon.extension.browser/storage';
-
-import MessagingBus from 'eon.extension.framework/messaging/bus';
+import PopupCallbackHandler from 'eon.extension.framework/popup/callback';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import querystring from 'querystring';
 
-import Plugin from '../../core/plugin';
+import Plugin from 'eon.extension.destination.lastfm/core/plugin';
 
-
-function getCallbackId() {
-    if(window.name !== '') {
-        return Promise.resolve(window.name);
-    }
-
-    return Storage.getString(Plugin.id + ':authentication.latestPopupId')
-        .then((callbackId) =>
-            'eon.popup/' + callbackId
-        );
-}
-
-function sendResponse(callbackId, token) {
-    return new Promise((resolve) => {
-        // Connect to relay messaging bus
-        let bus = new MessagingBus(callbackId + '/callback').connect(
-            'eon.extension.core:relay'
-        );
-
-        // Emit response event
-        if(typeof token !== 'undefined') {
-            bus.relay(callbackId, 'popup.resolve', token);
-        } else {
-            bus.relay(callbackId, 'popup.reject', 'Unable to retrieve token');
-        }
-
-        // Disconnect messaging bus
-        bus.disconnectAll();
-
-        resolve();
-    });
-}
 
 function process() {
-    // Validate search parameters
+    let handler = new PopupCallbackHandler(Plugin);
+
+    // Ensure search parameters exist
     if(window.location.search.length < 2) {
-        console.error('Missing search parameters');
+        handler.reject('Invalid callback query');
         return;
     }
 
-    // Decode query string
+    // Decode query parameters
     let query = querystring.decode(
         window.location.search.substring(1)
     );
 
-    // Send code to configuration page
-    getCallbackId().then((callbackId) => {
-        sendResponse(callbackId, query.token);
-    }).then(() => {
-        window.close();
-    });
+    // Ensure token is defined
+    if(!isDefined(query.token)) {
+        handler.reject('Unable to retrieve authorization code');
+        return;
+    }
+
+    // Resolve with token
+    handler.resolve(query.token);
 }
 
 // Process callback
