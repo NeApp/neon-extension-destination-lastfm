@@ -1,4 +1,5 @@
 import {
+    Group,
     Page,
     EnableOption
 } from 'eon.extension.framework/services/configuration/models';
@@ -20,6 +21,15 @@ export default [
 
         new AuthenticationOption(Plugin, 'authorization', 'Authentication', {
             requires: ['enabled']
-        })
+        }),
+
+        new Group(Plugin, 'scrobble', 'Scrobble', [
+            new EnableOption(Plugin, 'scrobble:enabled', 'Enabled', {
+                default: true,
+                requires: ['enabled'],
+
+                type: 'service'
+            })
+        ])
     ])
 ];
