@@ -1,7 +1,6 @@
 import Registry from 'eon.extension.framework/core/registry';
 import ScrobbleService from 'eon.extension.framework/services/destination/scrobble';
 import {MediaTypes} from 'eon.extension.framework/core/enums';
-import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import Client from '../../core/client';
 import Plugin from '../../core/plugin';
@@ -12,8 +11,6 @@ export class Scrobble extends ScrobbleService {
         super(Plugin, [
             MediaTypes.Music.Track
         ]);
-
-        this._recentScrobbles = {};
     }
 
     onStarted(session) {
@@ -33,21 +30,8 @@ export class Scrobble extends ScrobbleService {
         });
     }
 
-    onProgress(session) {
-        if(session.progress < 80 || isDefined(this._recentScrobbles[session.key])) {
-            return;
-        }
-
-        // Scrobble track
-        this._scrobble(session).then((response) => {
-            console.debug('TODO: Handle "scrobble" response:', response);
-        }, (body, statusCode) => {
-            console.debug('TODO: Handle "scrobble" error, status code: %o, body: %O', statusCode, body);
-        });
-    }
-
     onStopped(session) {
-        if(session.progress < 80 || isDefined(this._recentScrobbles[session.key])) {
+        if(session.progress < 80) {
             return;
         }
 
@@ -62,12 +46,6 @@ export class Scrobble extends ScrobbleService {
     // region Private methods
 
     _scrobble(session) {
-        if(isDefined(this._recentScrobbles[session.key])) {
-            return Promise.reject(new Error(
-                'Session has already been scrobbled'
-            ));
-        }
-
         // Build `item` for request
         let item = this._buildRequest(session.metadata);
 
@@ -79,9 +57,6 @@ export class Scrobble extends ScrobbleService {
 
         // Set `item` timestamp
         item.timestamp = Math.round(Date.now() / 1000);
-
-        // Mark session as scrobbled
-        this._recentScrobbles[session.key] = item.timestamp;
 
         // Scrobble track
         return Client['track'].scrobble([item]);
