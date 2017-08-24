@@ -24,9 +24,9 @@ export class Scrobble extends ScrobbleService {
 
         // Update now playing status
         Client['track'].updateNowPlaying(item).then((response) => {
-            console.debug('TODO: Handle "updateNowPlaying" response:', response);
+            console.info('TODO: Handle "updateNowPlaying" response:', response);
         }, (body, statusCode) => {
-            console.debug('TODO: Handle "updateNowPlaying" error, status code: %o, body: %O', statusCode, body);
+            console.info('TODO: Handle "updateNowPlaying" error, status code: %o, body: %O', statusCode, body);
         });
     }
 
@@ -37,9 +37,9 @@ export class Scrobble extends ScrobbleService {
 
         // Scrobble track
         this._scrobble(session).then((response) => {
-            console.debug('TODO: Handle "scrobble" response:', response);
+            console.info('TODO: Handle "scrobble" response:', response);
         }, (body, statusCode) => {
-            console.debug('TODO: Handle "scrobble" error, status code: %o, body: %O', statusCode, body);
+            console.info('TODO: Handle "scrobble" error, status code: %o, body: %O', statusCode, body);
         });
     }
 
