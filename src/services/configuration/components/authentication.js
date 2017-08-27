@@ -1,6 +1,6 @@
 import Extension from 'eon.extension.browser/extension';
 import Storage from 'eon.extension.browser/storage';
-import Popup from 'eon.extension.framework/popup';
+import MessagingBus, {ContextTypes} from 'eon.extension.framework/messaging/bus';
 import Registry from 'eon.extension.framework/core/registry';
 import {isDefined} from 'eon.extension.framework/core/helpers';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
@@ -8,6 +8,7 @@ import {OptionComponent} from 'eon.extension.framework/services/configuration/co
 import React from 'react';
 import uuid from 'uuid';
 
+import Account from '../../../core/account';
 import Client from '../../../core/client';
 import Plugin from '../../../core/plugin';
 import './authentication.scss';
@@ -17,8 +18,9 @@ export default class AuthenticationComponent extends OptionComponent {
     constructor() {
         super();
 
-        this.popup = null;
+        this.bus = null;
 
+        // Initial state
         this.state = {
             authenticated: false,
             account: {}
@@ -26,9 +28,6 @@ export default class AuthenticationComponent extends OptionComponent {
     }
 
     componentWillMount() {
-        // Ensure previous popup has been disposed
-        this.disposePopup();
-
         // Retrieve account details
         Storage.getObject(Plugin.id + ':account')
             .then((account) => {
@@ -43,100 +42,91 @@ export default class AuthenticationComponent extends OptionComponent {
             });
     }
 
-    disposePopup() {
-        if(!isDefined(this.popup)) {
-            return;
+    componentWillUnmount() {
+        // Close messaging bus
+        if(isDefined(this.bus)) {
+            this.bus.close();
+            this.bus = null;
         }
-
-        // Dispose popup (close window, disconnect messaging channel)
-        try {
-            this.popup.dispose();
-        } catch(e) {
-            console.warn('Unable to dispose popup:', e.stack);
-        }
-
-        // Clear state
-        this.popup = null;
     }
 
     onLoginClicked() {
-        let popupId = uuid.v4();
+        // Create messaging bus (and bind to authentication events)
+        if(!isDefined(this.bus)) {
+            this.bus = new MessagingBus(Plugin.id + ':authentication', {context: ContextTypes.Background});
+            this.bus.on('authentication.callback', (data) => this.onCallback(data));
+        }
 
-        // Build callback url
-        let callbackUrl = Extension.getCallbackUrl(
-            '/destination/lastfm/callback/callback.html'
-        );
+        // Generate callback id (to validate against received callback events)
+        this.callbackId = uuid.v4();
 
-        // Build authorize url
-        let authorizeUrl = Client['auth'].getAuthorizeUrl({
-            callbackUrl: callbackUrl
-        });
+        // Open account authorization page
+        window.open(Client['auth'].getAuthorizeUrl({
+            callbackUrl: Extension.getCallbackUrl('/destination/lastfm/callback/callback.html?id=' + this.callbackId)
+        }), '_blank');
+    }
 
-        // Ensure previous popup has been disposed
-        this.disposePopup();
+    onCallback(query) {
+        if(query.id !== this.callbackId) {
+            console.warn('Unable to authenticate with Last.fm: Invalid callback id');
 
-        // Create popup
-        this.popup = Popup.create(authorizeUrl, {
-            id: popupId,
+            // Display error on the callback page
+            this.bus.emit('authentication.error', {
+                'title': 'Invalid callback id',
+                'description': 'Please ensure you only click the "Login" button once.'
+            });
+            return;
+        }
 
-            location: 0,
-            status: 0,
-            toolbar: 0,
+        // Request session key
+        Client['auth'].getSession(query.token).then((session) => {
+            // Update client authorization
+            Client.session = session;
 
-            position: 'center',
-            width: 450,
-            height: 450,
+            // Update authorization token
+            return Storage.putObject(Plugin.id + ':session', session)
+                // Refresh account details
+                .then(() => this.refresh())
+                .then(() => {
+                    // Display success message on the callback page
+                    this.bus.emit('authentication.success');
 
-            offsetTop: 100
-        });
-
-        // Store latest popup id as fallback (for Firefox)
-        Storage.putString(Plugin.id + ':authentication.latestPopupId', popupId).then(() => {
-            // Open authorize popup
-            return this.popup.open()
-                .then((token) => Client['auth'].getSession(token))
-                .then((session) => {
-                    // Update client authorization
-                    Client.session = session;
-
-                    // Update authorization token
-                    return Storage.putObject(Plugin.id + ':session', session).then(() => {
-                        // Refresh account
-                        return this.refresh();
-                    });
-                }, (error) => {
-                    console.warn('Unable to authenticate with last.fm, error:', error.message);
+                    // Close messaging bus
+                    this.bus.close();
+                    this.bus = null;
                 });
+
+        }, (error) => {
+            console.warn('Unable to authenticate with Last.fm: %s', error.message);
+
+            // Display error on the callback page
+            this.bus.emit('authentication.error', {
+                'title': 'Unable to request authentication session',
+                'description': error.message
+            });
+
+            // Close messaging bus
+            this.bus.close();
+            this.bus = null;
         });
     }
 
     refresh() {
         // Ensure client has been initialized
-        return Client.ready.then(() =>
-            // Fetch account settings
-            Client['user'].getInfo().then((account) => {
-                console.log('account:', account);
+        return Account.refresh().then((account) => {
+            // Update state
+            this.setState({
+                authenticated: true,
+                account: account
+            });
 
-                // Update state
-                this.setState({
-                    authenticated: true,
-                    account: account
-                });
-
-                // Update account settings
-                Storage.putObject(Plugin.id + ':account', account);
-
-                return account;
-            }, (body, statusCode) => {
-                // Clear authorization
-                return this.logout().then(() => {
-                    // Reject promise
-                    return Promise.reject(new Error(
-                        'Unable to retrieve account settings, response with status code ' + statusCode + ' returned'
-                    ));
-                });
-            })
-        );
+            return account;
+        }, (e) => {
+            // Clear authorization
+            return this.logout().then(() => {
+                return Promise.reject(e);
+            });
+        });
     }
 
     logout() {
