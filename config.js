@@ -9,6 +9,7 @@ module.exports = {
     ],
     services: [
         'configuration',
+        'migrate',
 
         'destination/scrobble',
         'destination/sync'
