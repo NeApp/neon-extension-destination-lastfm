@@ -1,6 +1,7 @@
 import Registry from 'eon.extension.framework/core/registry';
 import ScrobbleService from 'eon.extension.framework/services/destination/scrobble';
 import {MediaTypes} from 'eon.extension.framework/core/enums';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import Client from '../../core/client';
 import Plugin from '../../core/plugin';
@@ -14,16 +15,15 @@ export class Scrobble extends ScrobbleService {
     }
 
     onStarted(session) {
-        // Build `item` for request
-        let item = this._buildRequest(session.metadata);
+        let request = this._buildRequest(session.item);
 
-        if(item === null) {
+        if(request === null) {
             console.warn('Unable to build request for session:', session);
             return;
         }
 
         // Update now playing status
-        Client['track'].updateNowPlaying(item).then((response) => {
+        Client['track'].updateNowPlaying(request).then((response) => {
             console.info('TODO: Handle "updateNowPlaying" response:', response);
         }, (body, statusCode) => {
             console.info('TODO: Handle "updateNowPlaying" error, status code: %o, body: %O', statusCode, body);
@@ -46,34 +46,43 @@ export class Scrobble extends ScrobbleService {
     // region Private methods
 
     _scrobble(session) {
-        // Build `item` for request
-        let item = this._buildRequest(session.metadata);
+        let request = this._buildRequest(session.item);
 
-        if(item === null) {
-            return Promise.reject(new Error(
-                'Unable to build request for session: ' + session
-            ));
+        if(request === null) {
+            return Promise.reject(new Error('Unable to build request for session: ' + session));
         }
 
         // Set `item` timestamp
-        item.timestamp = Math.round(Date.now() / 1000);
+        request.timestamp = Math.round(Date.now() / 1000);
 
         // Scrobble track
-        return Client['track'].scrobble([item]);
+        return Client['track'].scrobble([request]);
     }
 
-    _buildRequest(item) {
-        if(item.type.media !== MediaTypes.Music.Track) {
+    _buildRequest(track) {
+        if(track.type !== MediaTypes.Music.Track) {
             return null;
         }
 
-        return {
-            artist: item.artist.title,
-            album: item.album.title,
-            track: item.title,
+        let request = {
+            artist: track.artist.title,
+            album: track.album.title,
+            track: track.title,
 
-            duration: item.duration / 1000
+            duration: track.duration / 1000
         };
+
+        // Track Number
+        if(isDefined(track.number)) {
+            request.trackNumber = track.number;
+        }
+
+        // Album Artist
+        if(isDefined(track.album.artist.title) && track.album.artist.title !== track.artist.title) {
+            request.albumArtist = track.album.artist.title;
+        }
+
+        return request;
     }
 
     // endregion
