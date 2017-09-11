@@ -1,8 +1,6 @@
-import MessagingBus from 'eon.extension.framework/messaging/bus';
 import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import querystring from 'querystring';
-import uuid from 'uuid';
 
 import Plugin from 'eon.extension.destination.lastfm/core/plugin';
 
@@ -62,15 +60,11 @@ import Plugin from 'eon.extension.destination.lastfm/core/plugin';
     }
 
     function process() {
-        // Create messaging bus
-        let bus = new MessagingBus(Plugin.id + ':callback:' + uuid.v4());
+        let messaging = Plugin.messaging.service('authentication');
 
-        // Connect to channel
-        bus.connect(Plugin.id + ':authentication');
-
-        // Bind to authentication events
-        bus.on('authentication.success', onSuccess);
-        bus.on('authentication.error', onError);
+        // Bind events
+        messaging.once('success', onSuccess);
+        messaging.once('error', onError);
 
         // Ensure search parameters exist
         if(window.location.search.length < 2) {
@@ -96,7 +90,7 @@ import Plugin from 'eon.extension.destination.lastfm/core/plugin';
         }
 
         // Emit authentication token
-        bus.emit('authentication.callback', query);
+        messaging.emit('callback', query);
 
         // Display communication error if no response is returned in 5 seconds
         communicationTimeout = setTimeout(onTimeout, 5000);

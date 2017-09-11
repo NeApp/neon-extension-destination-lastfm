@@ -1,9 +1,8 @@
 import Extension from 'eon.extension.browser/extension';
-import Storage from 'eon.extension.browser/storage';
-import MessagingBus, {ContextTypes} from 'eon.extension.framework/messaging/bus';
+
 import Registry from 'eon.extension.framework/core/registry';
-import {isDefined} from 'eon.extension.framework/core/helpers';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import React from 'react';
 import uuid from 'uuid';
@@ -18,18 +17,36 @@ export default class AuthenticationComponent extends OptionComponent {
     constructor() {
         super();
 
-        this.bus = null;
+        this.messaging = null;
 
         // Initial state
         this.state = {
             authenticated: false,
+            subscribed: false,
             account: {}
         };
     }
 
+    componentWillUnmount() {
+        // Close messaging service
+        if(isDefined(this.messaging)) {
+            this.messaging.close();
+            this.messaging = null;
+        }
+    }
+
     componentWillMount() {
+        // Retrieve messaging service
+        this.messaging = Plugin.messaging.service('authentication');
+
+        // Subscribe to service
+        this.messaging.subscribe().then(
+            () => this.setState({ subscribed: true }),
+            () => this.setState({ subscribed: false })
+        );
+
         // Retrieve account details
-        Storage.getObject(Plugin.id + ':account')
+        Plugin.storage.getObject('account')
             .then((account) => {
                 if(account === null) {
                     return;
@@ -42,27 +59,18 @@ export default class AuthenticationComponent extends OptionComponent {
             });
     }
 
-    componentWillUnmount() {
-        // Close messaging bus
-        if(isDefined(this.bus)) {
-            this.bus.close();
-            this.bus = null;
-        }
-    }
-
     onLoginClicked() {
-        // Create messaging bus (and bind to authentication events)
-        if(!isDefined(this.bus)) {
-            this.bus = new MessagingBus(Plugin.id + ':authentication', {context: ContextTypes.Background});
-            this.bus.on('authentication.callback', (data) => this.onCallback(data));
-        }
+        // Bind to callback event
+        this.messaging.once('callback', this.onCallback.bind(this));
 
         // Generate callback id (to validate against received callback events)
         this.callbackId = uuid.v4();
 
-        // Open account authorization page
+        // Open authorization page
         window.open(Client['auth'].getAuthorizeUrl({
-            callbackUrl: Extension.getCallbackUrl('/destination/lastfm/callback/callback.html?id=' + this.callbackId)
+            callbackUrl: Extension.getCallbackUrl(
+                '/destination/lastfm/callback/callback.html?id=' + this.callbackId
+            )
         }), '_blank');
     }
 
@@ -70,8 +78,8 @@ export default class AuthenticationComponent extends OptionComponent {
         if(query.id !== this.callbackId) {
             console.warn('Unable to authenticate with Last.fm: Invalid callback id');
 
-            // Display error on the callback page
-            this.bus.emit('authentication.error', {
+            // Emit error event
+            this.messaging.emit('error', {
                 'title': 'Invalid callback id',
                 'description': 'Please ensure you only click the "Login" button once.'
             });
@@ -84,30 +92,22 @@ export default class AuthenticationComponent extends OptionComponent {
             Client.session = session;
 
             // Update authorization token
-            return Storage.putObject(Plugin.id + ':session', session)
+            return Plugin.storage.putObject('session', session)
                 // Refresh account details
                 .then(() => this.refresh())
                 .then(() => {
-                    // Display success message on the callback page
-                    this.bus.emit('authentication.success');
-
-                    // Close messaging bus
-                    this.bus.close();
-                    this.bus = null;
+                    // Emit success event
+                    this.messaging.emit('success');
                 });
 
         }, (error) => {
             console.warn('Unable to authenticate with Last.fm: %s', error.message);
 
-            // Display error on the callback page
-            this.bus.emit('authentication.error', {
+            // Emit error event
+            this.messaging.emit('error', {
                 'title': 'Unable to request authentication session',
                 'description': error.message
             });
-
-            // Close messaging bus
-            this.bus.close();
-            this.bus = null;
         });
     }
 
@@ -134,8 +134,8 @@ export default class AuthenticationComponent extends OptionComponent {
         Client.session = null;
 
         // Clear token and account details from storage
-        return Storage.put(Plugin.id + ':session', null)
-            .then(() => Storage.put(Plugin.id + ':account', null))
+        return Plugin.storage.put('session', null)
+            .then(() => Plugin.storage.put('account', null))
             .then(() => {
                 // Update state
                 this.setState({
@@ -190,6 +190,7 @@ export default class AuthenticationComponent extends OptionComponent {
                     <button
                         type="button"
                         className="button small"
+                        disabled={!this.state.subscribed}
                         onClick={this.onLoginClicked.bind(this)}>
                         Login
                     </button>

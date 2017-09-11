@@ -1,5 +1,4 @@
 import Preferences from 'eon.extension.browser/preferences';
-import Storage from 'eon.extension.browser/storage';
 import Log from 'eon.extension.framework/core/logger';
 import Registry from 'eon.extension.framework/core/registry';
 import MigrateService from 'eon.extension.framework/services/migrate';
@@ -46,7 +45,7 @@ export class LastFmMigrateService extends MigrateService {
             Preferences.putBoolean(Plugin.id + ':scrobble:enabled', true),
 
             // Session
-            Storage.putObject(Plugin.id + ':session', { key })
+            Plugin.storage.putObject('session', { key })
         ]);
     }
 }
