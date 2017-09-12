@@ -1,12 +1,11 @@
-import Preferences from 'eon.extension.browser/preferences';
+import Account from 'eon.extension.destination.lastfm/core/account';
+import Client from 'eon.extension.destination.lastfm/core/client';
+import Plugin from 'eon.extension.destination.lastfm/core/plugin';
+import Preferences from 'eon.extension.framework/preferences';
 import Log from 'eon.extension.framework/core/logger';
 import Registry from 'eon.extension.framework/core/registry';
 import MigrateService from 'eon.extension.framework/services/migrate';
 import {isDefined} from 'eon.extension.framework/core/helpers';
-
-import Account from '../../core/account';
-import Client from '../../core/client';
-import Plugin from '../../core/plugin';
 
 
 export class LastFmMigrateService extends MigrateService {
