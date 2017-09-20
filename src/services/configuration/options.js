@@ -1,12 +1,6 @@
-import {
-    Group,
-    Page,
-    EnableOption,
-    SelectOption
-} from 'eon.extension.framework/services/configuration/models';
+import {Group, Page, EnableOption, SelectOption} from 'eon.extension.framework/services/configuration/models';
 
 import AuthenticationOption from './models/authentication';
-
 import Plugin from '../../core/plugin';
 
 

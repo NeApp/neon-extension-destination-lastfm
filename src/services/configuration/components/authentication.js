@@ -1,11 +1,10 @@
-import Extension from 'eon.extension.browser/extension';
+import React from 'react';
+import uuid from 'uuid';
 
+import Extension from 'eon.extension.browser/extension';
 import Registry from 'eon.extension.framework/core/registry';
 import {OptionComponent} from 'eon.extension.framework/services/configuration/components';
 import {isDefined} from 'eon.extension.framework/core/helpers';
-
-import React from 'react';
-import uuid from 'uuid';
 
 import Account from '../../../core/account';
 import Client from '../../../core/client';

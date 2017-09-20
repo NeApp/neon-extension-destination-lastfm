@@ -1,8 +1,7 @@
-import {isDefined} from 'eon.extension.framework/core/helpers';
-
-import querystring from 'querystring';
+import QueryString from 'querystring';
 
 import Plugin from 'eon.extension.destination.lastfm/core/plugin';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 
 (function() {
@@ -76,7 +75,7 @@ import Plugin from 'eon.extension.destination.lastfm/core/plugin';
         }
 
         // Decode query parameters
-        let query = querystring.decode(
+        let query = QueryString.decode(
             window.location.search.substring(1)
         );
 
