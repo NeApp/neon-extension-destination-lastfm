@@ -11,7 +11,9 @@
       "alias": {
         "eon.extension.browser": "./src",
         "eon.extension.framework": "../../eon.extension.framework/src",
-        "eon.extension.destination.lastfm": "../../Destinations/eon.extension.destination.lastfm/src"
+        "eon.extension.destination.lastfm": "../../Destinations/eon.extension.destination.lastfm/src",
+
+        "lodash-amd": "lodash-es"
       }
     }]
   ]
