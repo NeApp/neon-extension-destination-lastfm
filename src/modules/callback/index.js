@@ -1,7 +1,7 @@
 import QueryString from 'querystring';
 
-import Plugin from 'eon.extension.destination.lastfm/core/plugin';
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import Plugin from 'neon-extension-destination-lastfm/core/plugin';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 (function() {

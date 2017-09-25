@@ -1,6 +1,6 @@
 import Merge from 'lodash-es/merge';
 
-import {PluginOption} from 'eon.extension.framework/services/configuration/models';
+import {PluginOption} from 'neon-extension-framework/services/configuration/models';
 
 
 export default class AuthenticationOption extends PluginOption {

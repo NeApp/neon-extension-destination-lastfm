@@ -5,13 +5,13 @@
     "transform-object-rest-spread",
     ["@fuzeman/module-resolver", {
       "root": [
-        "../eon.extension.browser.base/node_modules",
-        "../../Destinations/eon.extension.destination.lastfm/node_modules"
+        "../neon-extension-browser-base/node_modules",
+        "../../Destinations/neon-extension-destination-lastfm/node_modules"
       ],
       "alias": {
-        "eon.extension.browser": "./src",
-        "eon.extension.framework": "../../eon.extension.framework/src",
-        "eon.extension.destination.lastfm": "../../Destinations/eon.extension.destination.lastfm/src",
+        "neon-extension-browser": "./src",
+        "neon-extension-framework": "../../neon-extension-framework/src",
+        "neon-extension-destination-lastfm": "../../Destinations/neon-extension-destination-lastfm/src",
 
         "lodash-amd": "lodash-es"
       }
