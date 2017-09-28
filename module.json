@@ -1,0 +1,26 @@
+{
+  "title": "Last.fm",
+
+  "origins": [
+    "*://ws.audioscrobbler.com/2.0/*"
+  ],
+  "services": [
+    "configuration",
+    "migrate",
+
+    "destination/scrobble",
+    "destination/sync"
+  ],
+  "web_accessible_resources": [
+    "destination/lastfm/callback/callback.html"
+  ],
+
+  "webpack": {
+    "babel": [
+      "node_modules/@fuzeman/lastfm/src"
+    ],
+    "chunks": [
+      "callback"
+    ]
+  }
+}
