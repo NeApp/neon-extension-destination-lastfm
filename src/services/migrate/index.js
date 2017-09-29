@@ -13,7 +13,7 @@ export class LastFmMigrateService extends MigrateService {
         super(Plugin);
     }
 
-    onPreferences(preferences) {
+    onLegacyPreferences(preferences) {
         if(!isDefined(preferences.lastfm)) {
             return;
         }
