@@ -10,11 +10,8 @@ const Client = new LastFM(
 );
 
 function configure() {
-    // Retrieve current session
+    // Update client with current session
     return Plugin.storage.getObject('session').then((session) => {
-        Log.trace('Session: %o', session);
-
-        // Update client
         Client.session = session;
     });
 }
