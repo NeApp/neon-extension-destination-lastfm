@@ -4,6 +4,7 @@
   "origins": [
     "*://ws.audioscrobbler.com/2.0/*"
   ],
+
   "services": [
     "configuration",
     "migrate",
