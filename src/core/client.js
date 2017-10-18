@@ -1,6 +1,5 @@
 import {Client as LastFM} from '@fuzeman/lastfm/src/index';
 
-import Log from './logger';
 import Plugin from './plugin';
 
 
