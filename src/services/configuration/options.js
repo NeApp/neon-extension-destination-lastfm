@@ -9,7 +9,9 @@ export default [
         new EnableOption(Plugin, 'enabled', 'Enabled', {
             default: false,
 
-            type: 'plugin'
+            type: 'plugin',
+            permissions: true,
+            contentScripts: true
         }),
 
         new AuthenticationOption(Plugin, 'authorization', 'Authentication', {
