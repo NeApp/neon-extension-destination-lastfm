@@ -25,5 +25,8 @@
     "querystring-es3": "^0.2.1",
     "react": "^15.3.0",
     "uuid": "^2.0.3"
+  },
+  "scripts": {
+    "test": "echo No tests available yet."
   }
 }
