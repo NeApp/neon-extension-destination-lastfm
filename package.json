@@ -1,7 +1,22 @@
 {
   "name": "neon-extension-destination-lastfm",
   "version": "1.5.1-beta.1",
-  "main": "./src/index.js",
+  "description": "Neon Extension: Last.fm",
+  "keywords": ["neon", "neon-extension", "lastfm"],
+  "homepage": "https://github.com/NeApp/neon-extension",
+  "author": "Dean Gardiner <me@dgardiner.net>",
+  "license": "GPL-3.0",
+  "main": "./src",
+  "bugs": {
+    "url": "https://github.com/NeApp/neon-extension/issues"
+  },
+  "repostitory": {
+    "type": "git",
+    "url": "https://github.com/NeApp/neon-extension-destination-lastfm"
+  },
+  "scripts": {
+    "test": "echo No tests available yet."
+  },
   "dependencies": {
     "@fuzeman/lastfm": "1.0.0-alpha.2",
     "crypto-js": "3.1.6"
@@ -25,8 +40,5 @@
     "querystring-es3": "^0.2.1",
     "react": "^15.3.0",
     "uuid": "^2.0.3"
-  },
-  "scripts": {
-    "test": "echo No tests available yet."
   }
 }
