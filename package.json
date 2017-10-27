@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-destination-lastfm",
-  "version": "1.5.1-beta.2",
+  "version": "1.5.1",
   "description": "Neon Extension: Last.fm",
   "keywords": ["neon", "neon-extension", "lastfm"],
   "homepage": "https://github.com/NeApp/neon-extension",
@@ -36,7 +36,7 @@
   },
   "peerDependencies": {
     "lodash-es": "^4.16.1",
-    "neon-extension-framework": "^1.5.1-beta.1",
+    "neon-extension-framework": "^1.5.1",
     "querystring-es3": "^0.2.1",
     "react": "^15.3.0",
     "uuid": "^2.0.3"
