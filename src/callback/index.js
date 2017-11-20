@@ -1,5 +1,6 @@
 import QueryString from 'querystring';
 
+import FrameworkPlugin from 'neon-extension-framework/core/plugin';
 import Plugin from 'neon-extension-destination-lastfm/core/plugin';
 import {isDefined} from 'neon-extension-framework/core/helpers';
 
@@ -94,6 +95,9 @@ import {isDefined} from 'neon-extension-framework/core/helpers';
         // Display communication error if no response is returned in 5 seconds
         communicationTimeout = setTimeout(onTimeout, 5000);
     }
+
+    // Update page title
+    document.title = `${Plugin.title} Authentication - ${FrameworkPlugin.title}`;
 
     // Process callback
     process();
