@@ -1,7 +1,8 @@
+import IsNil from 'lodash-es/isNil';
+
 import Registry from 'neon-extension-framework/core/registry';
 import ScrobbleService from 'neon-extension-framework/services/destination/scrobble';
 import {MediaTypes} from 'neon-extension-framework/core/enums';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import Client from '../../core/client';
 import Plugin from '../../core/plugin';
@@ -73,12 +74,12 @@ export class Scrobble extends ScrobbleService {
         };
 
         // Track Number
-        if(isDefined(track.number)) {
+        if(!IsNil(track.number)) {
             request.trackNumber = track.number;
         }
 
         // Album Artist
-        if(isDefined(track.album.artist.title) && track.album.artist.title !== track.artist.title) {
+        if(!IsNil(track.album.artist.title) && track.album.artist.title !== track.artist.title) {
             request.albumArtist = track.album.artist.title;
         }
 

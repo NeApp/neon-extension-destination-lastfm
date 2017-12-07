@@ -1,10 +1,10 @@
+import IsNil from 'lodash-es/isNil';
 import React from 'react';
-import uuid from 'uuid';
+import Uuid from 'uuid';
 
 import Extension from 'neon-extension-browser/extension';
 import Registry from 'neon-extension-framework/core/registry';
 import {OptionComponent} from 'neon-extension-framework/services/configuration/components';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import Account from '../../../core/account';
 import Client from '../../../core/client';
@@ -28,7 +28,7 @@ export default class AuthenticationComponent extends OptionComponent {
 
     componentWillUnmount() {
         // Close messaging service
-        if(isDefined(this.messaging)) {
+        if(!IsNil(this.messaging)) {
             this.messaging.close();
             this.messaging = null;
         }
@@ -63,7 +63,7 @@ export default class AuthenticationComponent extends OptionComponent {
         this.messaging.once('callback', this.onCallback.bind(this));
 
         // Generate callback id (to validate against received callback events)
-        this.callbackId = uuid.v4();
+        this.callbackId = Uuid.v4();
 
         // Open authorization page
         window.open(Client['auth'].getAuthorizeUrl({

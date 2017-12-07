@@ -1,8 +1,8 @@
+import IsNil from 'lodash-es/isNil';
 import QueryString from 'querystring';
 
 import FrameworkPlugin from 'neon-extension-framework/core/plugin';
 import Plugin from 'neon-extension-destination-lastfm/core/plugin';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 (function() {
@@ -20,14 +20,14 @@ import {isDefined} from 'neon-extension-framework/core/helpers';
         }
 
         // Update message title
-        if(isDefined(title)) {
+        if(!IsNil(title)) {
             $title.textContent = title;
         } else {
             $title.textContent = '';
         }
 
         // Update message description
-        if(isDefined(description)) {
+        if(!IsNil(description)) {
             $description.textContent = description;
         } else {
             $description.textContent = '';
@@ -36,7 +36,7 @@ import {isDefined} from 'neon-extension-framework/core/helpers';
 
     function onSuccess() {
         // Clear the communication timeout handler
-        if(isDefined(communicationTimeout)) {
+        if(!IsNil(communicationTimeout)) {
             clearTimeout(communicationTimeout);
         }
 
@@ -81,7 +81,7 @@ import {isDefined} from 'neon-extension-framework/core/helpers';
         );
 
         // Ensure token is defined
-        if(!isDefined(query.token)) {
+        if(IsNil(query.token)) {
             onError({
                 title: 'Invalid callback parameters',
                 description: 'No "token" parameter was found.'
