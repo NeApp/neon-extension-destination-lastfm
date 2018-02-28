@@ -7,10 +7,8 @@
 
   "services": [
     "configuration",
-    "migrate",
 
-    "destination/scrobble",
-    "destination/sync"
+    "destination/scrobble"
   ],
   "web_accessible_resources": [
     "destination/lastfm/callback/callback.html"
