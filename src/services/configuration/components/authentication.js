@@ -82,6 +82,7 @@ export default class AuthenticationComponent extends OptionComponent {
                 'title': 'Invalid callback id',
                 'description': 'Please ensure you only click the "Login" button once.'
             });
+
             return;
         }
 
@@ -111,7 +112,7 @@ export default class AuthenticationComponent extends OptionComponent {
     }
 
     refresh() {
-        // Ensure client has been initialized
+        // Fetch account details
         return Account.refresh().then((account) => {
             // Update state
             this.setState({
