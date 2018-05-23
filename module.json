@@ -18,8 +18,8 @@
     "babel": [
       "node_modules/@fuzeman/lastfm/src"
     ],
-    "chunks": [
-      "callback"
-    ]
+    "modules": {
+      "Callback": true
+    }
   }
 }

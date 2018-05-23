@@ -1,6 +1,6 @@
 import {Client as LastFM} from '@fuzeman/lastfm/src/index';
 
-import Plugin from './plugin';
+import Plugin from '../Core/Plugin';
 
 
 const Client = new LastFM(

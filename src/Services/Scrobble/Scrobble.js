@@ -1,12 +1,11 @@
 import IsNil from 'lodash-es/isNil';
 
-import Registry from 'neon-extension-framework/core/registry';
-import ScrobbleService from 'neon-extension-framework/services/destination/scrobble';
-import {MediaTypes} from 'neon-extension-framework/core/enums';
-
-import Client from '../../core/client';
-import Log from '../../core/logger';
-import Plugin from '../../core/plugin';
+import Registry from 'neon-extension-framework/Core/Registry';
+import ScrobbleService from 'neon-extension-framework/Services/Destination/Scrobble';
+import {MediaTypes} from 'neon-extension-framework/Core/Enums';
+import Client from 'neon-extension-destination-lastfm/Api/Client';
+import Log from 'neon-extension-destination-lastfm/Core/Logger';
+import Plugin from 'neon-extension-destination-lastfm/Core/Plugin';
 
 
 export class Scrobble extends ScrobbleService {
