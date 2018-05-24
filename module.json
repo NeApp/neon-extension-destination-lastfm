@@ -10,7 +10,7 @@
     "Destination:Scrobble"
   ],
   "web_accessible_resources": [
-    "destination/lastfm/callback/callback.html"
+    "Modules/neon-extension-destination-lastfm/Callback.html"
   ],
 
   "webpack": {
