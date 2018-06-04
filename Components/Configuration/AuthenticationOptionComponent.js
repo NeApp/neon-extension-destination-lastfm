@@ -6,11 +6,11 @@ import Uuid from 'uuid';
 import Registry from 'neon-extension-framework/Core/Registry';
 import TranslationNamespace from 'neon-extension-framework/Components/Translation/Namespace';
 import {OptionComponent} from 'neon-extension-framework/Components/Configuration';
-import Account from 'neon-extension-destination-lastfm/Api/Account';
-import Client from 'neon-extension-destination-lastfm/Api/Client';
-import Log from 'neon-extension-destination-lastfm/Core/Logger';
-import Plugin from 'neon-extension-destination-lastfm/Core/Plugin';
 
+import Account from '../../Api/Account';
+import Client from '../../Api/Client';
+import Log from '../../Core/Logger';
+import Plugin from '../../Core/Plugin';
 import './AuthenticationOptionComponent.scss';
 
 
