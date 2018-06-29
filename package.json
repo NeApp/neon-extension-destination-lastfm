@@ -1,7 +1,7 @@
 {
   "name": "neon-extension-destination-lastfm",
   "version": "2.0.0-beta.3",
-  "description": "Neon Extension: Last.fm",
+  "description": "Radon Extension: Last.fm",
   "keywords": [
     "neon",
     "neon-extension",
