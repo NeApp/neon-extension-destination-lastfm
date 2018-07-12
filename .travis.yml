@@ -3,7 +3,7 @@ node_js:
 - '7'
 before_install:
 - npm install -g npm@'^5.10.0'
-- npm install -g NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install -g NeApp/neon-extension-build#develop
+- npm install -g RadonApp/radon-extension-build#$TRAVIS_BRANCH || npm install -g RadonApp/radon-extension-build#develop
 install:
 - neb travis:install $TRAVIS_BRANCH
 - neb package:validate
@@ -21,5 +21,5 @@ deploy:
   api_key:
     secure: ssUqDV5CNIDTDQ+sRzq4xbDJ00t9dXAMNtGvRSU1egLuwoQFCRd/pfQ+L1UXLDzVhtTnL6bwnCthM8aQlibl0V8AUIV35qL2BC/Vcl0UiV1M4tUsW9WIUqk0SWgdHLpb7JApISxIPmfZUFMzZ+KxNuiOWxxyrDCJBU3t1M5zDOHfSeaNcTjwgoqdUqnzGizb8zT2SnYyE7HTstdzJPuccBxCzia4J9Pzd6hCYRjnDoIfE2/YgFBB4QnLcj3u9dCnrJSNz2JMCt9YnWVFzfLx4Zr5ndaUQ0h3AZkZHfcOUjTdIJ5XMI7ad/guGAN939nQGGRzWignnslBcIp/ohCdHG6EVo4ngesL+33sU6int96JN+MStjW4jMNFu5CWv37nWaPP6sh/8r52+G8cJ3z2YOami/sC/1WpkfOcutiAJDTGVfMaQR0FQ7HJX83RDE09tZKkSExdAg9637hKlJJuoUVVeS7zpLdMzDePX0kPbGzMvkrE3y2A/Kwjs6BHTi34+dqLcJRBGY3v4wdJTA9jAN5SOOLvRgdIejNPTjU7VZkdB9WWQxId1XEMC8VdZn8dRv6wScdvbJE1pQjYg9QyRcwl2fWZwPxR33c2ZwdO0GDaejsepMD+tlFHJyPq6nlheO9QU55xU+9yvLgj6tyq3x90gA04rAlcPtDdwEPDy9w=
   on:
-    repo: NeApp/neon-extension-destination-lastfm
+    repo: RadonApp/radon-extension-plugin-lastfm
     tags: true
