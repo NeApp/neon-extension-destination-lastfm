@@ -67,7 +67,7 @@ export default class AuthenticationOptionComponent extends OptionComponent {
         // Open authorization page
         window.open(Client['auth'].getAuthorizeUrl({
             callbackUrl: Runtime.getURL(
-                '/Modules/neon-extension-destination-lastfm/Callback.html?id=' + this.callbackId
+                '/Plugins/lastfm/Callback.html?id=' + this.callbackId
             )
         }), '_blank');
     }
