@@ -15,4 +15,10 @@ export default class Account {
             ));
         });
     }
+
+    static reset() {
+        return Promise.resolve()
+            .then(() => Plugin.storage.put('session', null))
+            .then(() => Plugin.storage.put('account', null));
+    }
 }

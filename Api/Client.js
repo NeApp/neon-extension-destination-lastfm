@@ -1,7 +1,9 @@
-import {Client as LastFM} from '@fuzeman/lastfm/src/index';
+import {Client as LastFM, ApiError, NetworkError} from '@fuzeman/lastfm/src';
 
 import Plugin from '../Core/Plugin';
 
+
+export {ApiError, NetworkError};
 
 const Client = new LastFM(
     '2c794d3b3415a2fb072f41fc8a8edcc7',

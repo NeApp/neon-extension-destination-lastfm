@@ -156,16 +156,14 @@ export default class AuthenticationOptionComponent extends OptionComponent {
         // Reset last.fm client
         Client.session = null;
 
-        // Clear token and account details from storage
-        return Plugin.storage.put('session', null)
-            .then(() => Plugin.storage.put('account', null))
-            .then(() => {
-                // Update state
-                this.setState({
-                    authenticated: false,
-                    account: {}
-                });
+        // Reset account details
+        return Account.reset().then(() => {
+            // Update state
+            this.setState({
+                authenticated: false,
+                account: {}
             });
+        });
     }
 
     render() {

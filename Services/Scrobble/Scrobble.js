@@ -6,7 +6,8 @@ import Registry from '@radon-extension/framework/Core/Registry';
 import ScrobbleService from '@radon-extension/framework/Services/Destination/Scrobble';
 import {MediaTypes} from '@radon-extension/framework/Core/Enums';
 
-import Client from '../../Api/Client';
+import Account from '../../Api/Account';
+import Client, {ApiError} from '../../Api/Client';
 import Log from '../../Core/Logger';
 import Plugin from '../../Core/Plugin';
 
@@ -19,18 +20,11 @@ export class Scrobble extends ScrobbleService {
     }
 
     onStarted(session) {
-        let request = this._buildRequest(session.item);
-
-        if(request === null) {
-            Log.warn('Unable to build request for session:', session);
-            return;
-        }
-
         // Update now playing status
-        Client['track'].updateNowPlaying(request).then((response) => {
+        this._updateNowPlaying(session).then((response) => {
             Log.info('TODO: Handle "updateNowPlaying" response:', response);
-        }, (body, statusCode) => {
-            Log.info('TODO: Handle "updateNowPlaying" error, status code: %o, body: %O', statusCode, body);
+        }, (err) => {
+            Log.info('TODO: Handle "updateNowPlaying" error:', err);
         });
     }
 
@@ -39,11 +33,11 @@ export class Scrobble extends ScrobbleService {
             return;
         }
 
-        // Scrobble track
+        // Scrobble session
         this._scrobble(session).then((response) => {
             Log.info('TODO: Handle "scrobble" response:', response);
-        }, (body, statusCode) => {
-            Log.info('TODO: Handle "scrobble" error, status code: %o, body: %O', statusCode, body);
+        }, (err) => {
+            Log.info('TODO: Handle "scrobble" error:', err);
         });
     }
 
@@ -59,8 +53,23 @@ export class Scrobble extends ScrobbleService {
         // Set `item` timestamp
         request.timestamp = Math.round(Date.now() / 1000);
 
-        // Scrobble track
-        return Client['track'].scrobble([request]);
+        // Scrobble session
+        return this._onResponse(
+            Client['track'].scrobble([request])
+        );
+    }
+
+    _updateNowPlaying(session) {
+        let request = this._buildRequest(session.item);
+
+        if(request === null) {
+            return Promise.reject(new Error('Unable to build request for session: ' + session));
+        }
+
+        // Update now playing status
+        return this._onResponse(
+            Client['track'].updateNowPlaying(request)
+        );
     }
 
     _buildRequest(track) {
@@ -94,6 +103,22 @@ export class Scrobble extends ScrobbleService {
 
         // Remove undefined properties
         return OmitBy(request, IsNil);
+    }
+
+    _onResponse(promise) {
+        return promise.catch((err) => {
+            // Reset account on invalid session key (expired)
+            if(err instanceof ApiError && err.code === 9) {
+                Log.info('Authentication has expired, clearing session');
+
+                return Account.reset().then(() =>
+                    Promise.reject(err)
+                );
+            }
+
+            // Unhandled error
+            return Promise.reject(err);
+        });
     }
 
     // endregion
